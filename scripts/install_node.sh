@@ -1,8 +1,8 @@
 installNode() {
   NODE_VERSION=16.0.0
   NODE_NAME="node.$NODE_VERSION"
-  NODE_TAR_NAME="$NODE_NAME.tar.gz"
-  wget "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION.tar.gz" -O $NODE_TAR_NAME
+  NODE_TAR_NAME="$NODE_NAME.tar.xz"
+  wget "https://nodejs.org/dist/v16.14.2/node-v16.14.2-linux-x64.tar.xz" -O $NODE_TAR_NAME
   if [ $? != 0 ]; then
     echo "node 下载失败"
     return 2
@@ -10,12 +10,21 @@ installNode() {
   tar -xvf $NODE_TAR_NAME
   # 删除原有路径
   rm -rf /usr/local/opt/$NODE_NAME
+  mkdir -p  /usr/local/opt/
   mv $NODE_NAME /usr/local/opt/$NODE_NAME
 
-  # 设置path
+  # 全局环境使用node相关命令有两种方式
+  # 1. 设置path
   echo "设置node环境path"
-  cp /etc/profile /etc/profile.bak
-  cat "export PATH=$PATH:/usr/local/opt/$NODE_NAME/bin" >>/etc/profile
+  cp ~/.profile ~/.profile.bak
+  cat "export PATH=$PATH:/usr/local/opt/$NODE_NAME/bin" >> ~/.profile
+  source ~/.profile
+
+  # 2. 设置软链指向 /usr/local/opt/$NODE_NAME/bin/ 目录
+  # ln -s /usr/local/opt/$NODE_NAME/bin/node /usr/bin/node
+  # ln -s /usr/local/opt/$NODE_NAME/bin/npm /usr/bin/npm
+  # ln -s /usr/local/opt/$NODE_NAME/bin/npx /usr/bin/npx
+
   echo "当前node版本为： $(node -v)"
   # echo "当前npm版本为： $(node -v)"
 }
