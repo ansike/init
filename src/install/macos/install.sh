@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+# set -e
 
 # 需要按照自己实际的代理走
 export http_proxy=http://localhost:7890
@@ -160,7 +160,7 @@ check_version "vscode" $(code -v)
 ###############
 # 安装 node
 ###############
-order='code'
+order='node'
 if ! check_installed $order; then
     nvm install 16.14.0
 fi

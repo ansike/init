@@ -1,5 +1,13 @@
 # 安装软件开发中必要的软件
 
+
+### 直接安装
+
+```shell
+# mac 快速安装基础开发环境
+/bin/zsh -c "$(curl -o- https://raw.githubusercontent.com/ansike/init/master/src/install/macos/install.sh)"
+```
+
 ### 软件清单
 1. git
 2. 前端系列
@@ -12,3 +20,4 @@
 3. python
 4. docker
 5. ssh
+
