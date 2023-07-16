@@ -182,7 +182,7 @@ check_version "yarn" $($order -v)
 # 安装@vue/cli
 ###############
 if ! check_installed vue; then
-    yarn global -g @vue/cli
+    yarn global add @vue/cli
 fi
 
 check_version $(vue -V)
