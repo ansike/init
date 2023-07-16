@@ -6,13 +6,6 @@ set -e
 export http_proxy=http://localhost:7890
 export https_proxy=http://localhost:7890
 
-# TODO 应该可以删掉
-[ $SHELL = '/bin/zsh' ] && source ~/.zshrc || {
-    source ~/.bashrc
-    source ~/.profile
-    source ~/.bash_profile
-}
-
 # 检查软件是否已经安装
 check_installed() {
     # echo "检查命令是否存在"$1
@@ -65,6 +58,23 @@ fi
 
 check_version $(brew -v)
 
+# 切换到zsh
+[ $SHELL != "/bin/zsh" ] && {
+    log "当前环境的shell为$SHELL, 切换到zsh"
+    chsh -s /bin/zsh
+} || log "当前环境shell为 zsh"
+
+###############
+# 安装oh-my-zsh
+###############
+if ! cat ~/.zshrc | grep "oh-my-zsh" >/dev/null ; then
+    log "正在安装oh-my-zsh..."
+
+    /bin/bash -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+
+    [ $? -eq 0 ] && log "oh-my-zsh安装完成。" || log "oh-my-zsh安装失败。"
+fi
+
 ###############
 # 检查 unzip 是否已安装
 ###############
@@ -90,7 +100,8 @@ fi
 
 check_version $(git -v)
 
-if check_installed "git"; then
+# if check_installed "git" && ! git config --global --get alias.st >/dev/null 2>&1; then
+if check_installed "git" && [ -z "$(git config --global --get alias.st)" ]; then
     log "git 已安装, 开始设置 git alias"
     git config --global alias.st status
     git config --global alias.aa "add ."
@@ -98,20 +109,19 @@ if check_installed "git"; then
     git config --global alias.cm "commit -m"
     git config --global alias.br branch
     git config --global alias.lg "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
-else
-    log "git 未安装, 需要安装之后重新运行该shell"
 fi
 
 ###############
 # 安装nvm
 ###############
+source ~/.zshrc
 order='nvm'
 if ! check_installed nvm; then
     log "正在安装 $order ..."
 
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
 
-    [ $SHELL = '/bin/zsh' ] && source ~/.zshrc || {
+    [ $SHELL == '/bin/zsh' ] && source ~/.zshrc || {
         source ~/.bashrc
         source ~/.profile
         source ~/.bash_profile
