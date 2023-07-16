@@ -58,6 +58,30 @@ fi
 
 check_version $(brew -v)
 
+###############
+# 安装 iterm2
+###############
+order='iterm2'
+if ! ls /Applications/iTerm.app >/dev/null 2>&1; then
+    log "正在安装$order..."
+
+    brew install iterm2  
+
+    [ $? -eq 0 ] && log "${order}安装完成。" || log "${order}安装失败。"
+fi
+
+###############
+# 安装 Alfred
+###############
+order='alfred'
+if ! ls /Applications/Alfred\ 5.app >/dev/null 2>&1; then
+    log "正在安装$order..."
+
+    brew install $order  
+
+    [ $? -eq 0 ] && log "${order}安装完成。" || log "${order}安装失败。"
+fi
+
 # 切换到zsh
 [ $SHELL != "/bin/zsh" ] && {
     log "当前环境的shell为$SHELL, 切换到zsh"
