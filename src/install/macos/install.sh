@@ -167,6 +167,7 @@ fi
 
 check_version "node" $($order -v)
 check_version "npm" $(npm -v)
+npm config set registry https://registry.npmmirror.com/
 
 ###############
 # 安装yarn
@@ -177,6 +178,7 @@ if ! check_installed $order; then
 fi
 
 check_version "yarn" $($order -v)
+yarn config set registry https://registry.npmmirror.com/
 
 ###############
 # 安装@vue/cli
