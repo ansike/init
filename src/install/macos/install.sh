@@ -5,30 +5,105 @@ check_installed() {
     command -v "$1" &> /dev/null
 }
 
-# 安装Homebrew（如果尚未安装）
-if ! check_installed brew; then
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+# 输出日志信息
+log() {
+    echo "$(date +'%Y-%m-%d %H:%M:%S') - $1"
+}
+
+# 显示进度
+show_progress() {
+    local -r pid=$1
+    local -r delay=0.5
+    local spin='-\|/'
+    local i=0
+
+    log "正在安装中，请稍候..."
+
+    while kill -0 $pid 2>/dev/null; do
+        local i=$(( (i+1) %4 ))
+        printf "\r${spin:$i:1}"
+        sleep $delay
+    done
+
+    printf "\r"
+}
+
+###############
+# 检查 Xcode 是否已安装
+###############
+if ! check_installed xcode-select; then
+    log "Xcode未找到，正在安装Xcode..."
+
+    # 安装 Xcode Command Line Tools
+    xcode-select --install &>/dev/null
+
+    # 显示安装进度
+    show_progress $!
+
+    log "Xcode安装完成。"
 fi
 
-# 安装Git
+[ $? -eq 0 ] && log "Xcode pass"
+
+###############
+# 安装Homebrew（如果尚未安装）
+###############
+if ! check_installed brew; then
+    log "正在安装Homebrew..."
+
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" &>/dev/null
+
+    log "Homebrew安装完成。"
+fi
+
+###############
+# 安装&配置Git
+###############
+# 检查 unzip 是否已安装
+if ! check_installed unzip; then
+    log "unzip未找到，正在安装unzip..."
+
+    # 安装 unzip
+    brew install unzip &>/dev/null
+
+    log "unzip安装完成。"
+fi
+
+###############
+# 安装&配置Git
+###############
 if ! check_installed git; then
     brew install git
 fi
 
-# 安装Node.js
-if ! check_installed node; then
-    brew install node
+###############
+# 安装nvm
+###############
+if ! check_installed nvm; then
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
 fi
 
-# 安装Yarn
-if ! check_installed yarn; then
-    brew install yarn
+###############
+# 检查 VSCode 是否已安装
+###############
+if ! check_installed code; then
+    log "VSCode未找到，正在安装VSCode..."
+
+    # 下载安装包
+    curl -o vscode.zip -L https://code.visualstudio.com/sha/download\?build\=stable\&os\=darwin-universal
+
+    # 解压缩安装包
+    unzip vscode.zip
+
+    # 安装 VSCode
+    sudo mv "Visual Studio Code.app" "/Applications/"
+
+    # 清理安装文件
+    rm vscode.zip
+
+    log "VSCode安装完成。"
 fi
 
-# 安装pnpm
-if ! check_installed pnpm; then
-    brew install pnpm
-fi
 
 # 安装@vue/cli
 if ! check_installed vue; then
@@ -38,11 +113,6 @@ fi
 # 安装create-react-app
 if ! check_installed create-react-app; then
     yarn global add create-react-app
-fi
-
-# 安装http-server
-if ! check_installed http-server; then
-    npm install -g http-server
 fi
 
 # 安装Python（使用pyenv管理多个版本）
